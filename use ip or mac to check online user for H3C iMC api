@@ -3,10 +3,10 @@ import urllib2
 import json
 import re
 
-usernames='weisong5'
-passwords='admin565788'
+usernames='username'
+passwords='password'
 
-imc_url='na.intra.sina.com.cn'
+imc_url='imc's address or domain name'
 http_url='https://'
 api_url_ip='/imcrs/uam/online/onlineNotice?framedIp='
 api_url_mac='/imcrs/uam/online/onlineNotice?macAddress='
