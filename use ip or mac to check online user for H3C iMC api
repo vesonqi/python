@@ -6,7 +6,7 @@ import re
 usernames='loginname'
 passwords='loginpassword'
 
-imc_url='na.intra.sina.com.cn'
+imc_url='your imc's ip or domain name'
 http_url='https://'
 api_url='/imcrs/uam/online/onlineNotice?framedIp='
 inputstr=raw_input('\ninput ip or mac address(a.b.c.d or aa:bb:cc:dd:ee:ff):')
