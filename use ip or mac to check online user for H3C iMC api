@@ -3,35 +3,51 @@ import urllib2
 import json
 import re
 
-usernames='loginname'
-passwords='loginpassword'
+usernames='weisong5'
+passwords='admin565788'
 
-imc_url='your imc's ip or domain name'
+imc_url='na.intra.sina.com.cn'
 http_url='https://'
-api_url='/imcrs/uam/online/onlineNotice?framedIp='
+api_url_ip='/imcrs/uam/online/onlineNotice?framedIp='
+api_url_mac='/imcrs/uam/online/onlineNotice?macAddress='
 inputstr=raw_input('\ninput ip or mac address(a.b.c.d or aa:bb:cc:dd:ee:ff):')
 print '\n  Your Input is  :'+inputstr+'\n'
 
-def isValidIPorMAC(str):
+def isValidIP(str):
     if re.match(r"\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b", str):
         return True
     else:
-        if re.match(r"^\s*([0-9a-fA-F]{2,2}:){5,5}[0-9a-fA-F]{2,2}\s*$",str):
-            return True
         return False
-    return False
+
+def isValidMAC(str):
+    if re.match(r"^\s*([0-9a-fA-F]{2,2}:){5,5}[0-9a-fA-F]{2,2}\s*$",str):
+        return True
+    else:
+        return False
+
+def isValidIPorMAC(str):
+    if isValidIP(str):
+        return True
+    else:
+        if isValidMAC(str):
+            return True
+        else:
+            return False
 
 if isValidIPorMAC(inputstr):
+    if isValidIP(inputstr):
+        find_api=http_url+imc_url+api_url_ip+inputstr
+    else:
+        find_api=http_url+imc_url+api_url_mac+inputstr
     try:
         authhandler = urllib2.HTTPDigestAuthHandler()
         authhandler.add_password("iMC RESTful Web Services", imc_url, usernames, passwords)
         opener = urllib2.build_opener(authhandler)
         urllib2.install_opener(opener)
-        pagehandle=urllib2.Request(http_url+imc_url+api_url+inputstr)
-
+        pagehandle=urllib2.Request(find_api)
         pagehandle.add_header('Accept', 'application/json')
-        result = urllib2.urlopen(pagehandle)
 
+        result = urllib2.urlopen(pagehandle)
         findout=json.loads(result.read()).values()
 
     except ValueError:
