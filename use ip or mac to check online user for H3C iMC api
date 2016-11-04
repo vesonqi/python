@@ -3,14 +3,16 @@ import urllib2
 import json
 import re
 
-usernames='username'
-passwords='passcode'
+usernames='xxx'
+passwords='xxx'
 
-imc_url='imc's address or domain name'
+print '\n < IP user findout tool > version 0.11 by VesonQI'
+
+imc_url='x.x.x.x'
 http_url='https://'
 api_url_ip='/imcrs/uam/online/onlineNotice?framedIp='
 api_url_mac='/imcrs/uam/online/onlineNotice?macAddress='
-inputstr=raw_input('\ninput ip or mac address(a.b.c.d or aa:bb:cc:dd:ee:ff):')
+inputstr=raw_input('\ninput ip or mac address:')
 api_url_history='/imcrs/uam/acmUser/acmDetailList?size=5&framedIpAddressFrom='+inputstr+'&framedIpAddressTo='+inputstr+'&desc=true'
 print '\n  Your Input is  :'+inputstr+'\n'
 
@@ -64,13 +66,9 @@ if isValidIPorMAC(inputstr):
 
         print '  Find 1 Online Record:'+'\n'
 
-        print '    UserIP    :'+userip
-        print '    UserMAC   :'+usermac
-        print '    OnlineTime:'+starttime
-        print '    UserName  :'+frontstr
-        print '    Name      :'+userfullname
-
-    print '\n  History Result listed below:'+'\n'
+        print '    UserIP/MAC:'+userip+' / '+usermac
+        print '    UserName  :'+frontstr+' / '+userfullname
+        print '    StartTime :'+starttime
 
     try:
         find_api=http_url+imc_url+api_url_history
@@ -82,18 +80,25 @@ if isValidIPorMAC(inputstr):
     except ValueError:
         print '  Notice:the input address has NO online record !'
     else:
-    	for seq in range(0,min(len(findout['acmDetail']),5)):
-            findout_history=findout['acmDetail'][seq]
-            userip=findout_history['framedIpAddress']
-            starttime=findout_history['accessStartTime']
-            endtime=findout_history['accessEndTime']
-            frontstr=findout_history['userName']
-            usermac=findout_history['macAddress']
-            userfullname=findout_history['fullName']
-            print '    OnlineTime:'+starttime+' - '+endtime
-            print '    UserIP/MAC:'+userip+' / '+usermac
-            print '    UserName  :'+frontstr
-            print '    Name      :'+userfullname+'\n'
+        try:
+            number=len(findout['acmDetail'])
+            number_list=min(len(findout['acmDetail']),5)
+        except KeyError:
+        	print '\n  Notice:the input address has NO online record !'
+        else:
+            print '\n  Find latest '+str(number)+' Result(s),'+ str(number_list) +' Record(s) listed below:\n'
+
+            for seq in range(0,number_list):
+                findout_history=findout['acmDetail'][seq]
+                userip=findout_history['framedIpAddress']
+                starttime=findout_history['accessStartTime']
+                endtime=findout_history['accessEndTime']
+                frontstr=findout_history['userName']
+                usermac=findout_history['macAddress']
+                userfullname=findout_history['fullName']
+                print '    OnlineTime:'+starttime+' - '+endtime
+                print '    UserIP/MAC:'+userip+' / '+usermac
+                print '    UserName  :'+frontstr+' / '+userfullname+'\n'
 
 else:
     print '  Notice:input string is NOT a valid ip or MAC address !'
