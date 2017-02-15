@@ -1,0 +1,40 @@
+#-*- coding: UTF-8 -*- 
+#updated Feb 15,2017,by vesonqi@gmail.com
+
+def isValidMAC(macadd):
+    if len(macadd)==14:
+        return True
+    else:
+        return False
+
+def macfmt(macadd):
+    i=''
+    for a in macadd:
+        if a.isdigit():
+            i=i+a
+        elif a.isalpha():
+            i=i+a.upper()
+    return i[0:4] + '-' + i[4:8] + '-' + i[8:]
+
+def cmdtool(macadd,vlan):
+    macadd=str(macfmt(macadd))
+    
+    if not isValidMAC(macadd):
+        print '\n  Error:the MAC address -->'+ macadd +'<-- is NOT valid !'
+        exit()
+    else: 
+        print '\n  NOTICE:Command below will add ' + macadd + ' ---> ' + 'vlan 'vlan
+        print '\n'
+        print 'reset wlan client mac ' + macadd
+        print 'system-v'
+        print ' cut conn mac ' + macadd
+        print ' undo mac-vlan mac ' + macadd
+        print ' mac-vlan mac ' + macadd + ' vlan ' + vlan
+        print ' quit' 
+        print 'dis cu | in ' + macadd
+        print '\n'
+        
+macadd=raw_input('\n  input mac address:')
+vlan=raw_input('  define vlan id:')
+
+cmdtool(macadd,vlan)
