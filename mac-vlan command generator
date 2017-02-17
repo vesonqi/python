@@ -1,5 +1,6 @@
 #-*- coding: UTF-8 -*- 
-#updated Feb 15,2017,by vesonqi@gmail.com
+#updated Feb 17,2017,by vesonqi@gmail.com
+#put a string like MAC address,generate the command of H3C's wireless controller.copy the output to command line directly.
 
 def isValidMAC(macadd):
     if len(macadd)==14:
@@ -16,25 +17,47 @@ def macfmt(macadd):
             i=i+a.upper()
     return i[0:4] + '-' + i[4:8] + '-' + i[8:]
 
-def cmdtool(macadd,vlan):
+def cmdtool(macadd,vlan,vlan2):
+
     macadd=str(macfmt(macadd))
-    
+    if not vlan2:
+    	vlan2=vlan
     if not isValidMAC(macadd):
-        print '\n  Error:the MAC address -->'+ macadd +'<-- is NOT valid !'
-        exit()
+        print '\n    Error:your input -->'+ macadd +'<-- is NOT a valid mac address!'
+        mainf()
     else: 
-        print '\n  NOTICE:Command below will add ' + macadd + ' ---> ' + 'vlan 'vlan
+        print '\n  NOTICE:Command below will add ' + macadd + ' to ' + 'vlan ' + vlan
         print '\n'
-        print 'reset wlan client mac ' + macadd
-        print 'system-v'
-        print ' cut conn mac ' + macadd
-        print ' undo mac-vlan mac ' + macadd
-        print ' mac-vlan mac ' + macadd + ' vlan ' + vlan
-        print ' quit' 
-        print 'dis cu | in ' + macadd
+        print ' reset wlan client mac ' + macadd
+        print ' system-v'
+        print '  cut conn mac ' + macadd
+        print '  undo mac-vlan mac ' + macadd
+        print '  mac-vlan mac ' + macadd + ' vlan ' + vlan
+        print '  quit' 
+        print ' dis cu | in ' + macadd.lower()
         print '\n'
         
-macadd=raw_input('\n  input mac address:')
-vlan=raw_input('  define vlan id:')
+        print '\n  NOTICE:Command below will add ' + macadd + ' to ' + 'vlan ' + vlan2
+        print '\n'
+        print ' reset wlan client mac ' + macadd
+        print ' system-v'
+        print '  cut conn mac ' + macadd
+        print '  undo mac-vlan mac ' + macadd
+        print '  mac-vlan mac ' + macadd + ' vlan ' + vlan2
+        print '  quit' 
+        print ' dis cu | in ' + macadd.lower()
+        print '\n'
 
-cmdtool(macadd,vlan)
+def mainf():
+    macadd = raw_input('\n  input mac address(\'q\' for quit)   :')
+    if macadd == 'q':
+        exit()
+    vlan   = raw_input('  define First dst vlan id(must)      :')
+    if vlan == 'q':
+        exit()
+    vlan2  = raw_input('  define Second dst vlan id(if needed):')
+    if vlan == 'q':
+        exit()
+    cmdtool(macadd,vlan,vlan2)
+
+mainf()
