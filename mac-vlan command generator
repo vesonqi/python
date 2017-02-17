@@ -48,16 +48,18 @@ def cmdtool(macadd,vlan,vlan2):
         print ' dis cu | in ' + macadd.lower()
         print '\n'
 
+def qforquit(q):
+    if q == 'q':
+        print '\n    notice:pressed \'q\' for quit,goodbye!'
+        exit()
+
 def mainf():
     macadd = raw_input('\n  input mac address(\'q\' for quit)   :')
-    if macadd == 'q':
-        exit()
+    qforquit(macadd)
     vlan   = raw_input('  define First dst vlan id(must)      :')
-    if vlan == 'q':
-        exit()
+    qforquit(vlan)
     vlan2  = raw_input('  define Second dst vlan id(if needed):')
-    if vlan == 'q':
-        exit()
+    qforquit(vlan2)
     cmdtool(macadd,vlan,vlan2)
 
 mainf()
