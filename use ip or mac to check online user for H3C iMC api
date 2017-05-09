@@ -1,33 +1,97 @@
+#-*- coding: UTF-8 -*- 
+
 import sys
 import urllib2
 import json
 import re
+import datetime
+import getpass
 
-usernames='xxx'
-passwords='xxx'
+#欢迎信息及前台版本
+def sayhello():
+    print '\n    +------------------------------------------------------------+'
+    print '    |     < IP user findout tool > version 1.5 by VesonQI        |'
+    print '    +------------------------------------------------------------+\n'
 
-print '\n < IP user findout tool > version 0.11 by VesonQI'
+#简单登陆身份口令验证
+def login_auth():
+    print '    Authentication Required!'
 
-imc_url='x.x.x.x'
-http_url='https://'
-api_url_ip='/imcrs/uam/online/onlineNotice?framedIp='
-api_url_mac='/imcrs/uam/online/onlineNotice?macAddress='
-inputstr=raw_input('\ninput ip or mac address:')
-api_url_history='/imcrs/uam/acmUser/acmDetailList?size=5&framedIpAddressFrom='+inputstr+'&framedIpAddressTo='+inputstr+'&desc=true'
-print '\n  Your Input is  :'+inputstr+'\n'
+    auth_base=[
+               ['aaa','111',],
+               ['bbb','222'],
+               ['ccc','333']
+              ]
 
+    for i in range(0,3): 
+        login_name=raw_input('      username:')
+        login_code=getpass.getpass('      password:')
+        if [login_name,login_code] in auth_base:
+            return
+        else:
+            print '          login failed!'
+    else:
+        print '      notice:if u forget ur passcode,contact weisong5 for help !'
+        exit()
+
+#输入交互
+def forinput():
+    inputstr=raw_input('\n  input IP or MAC address(\'Q\' for quit):')
+    if inputstr=='q' or inputstr=='Q':
+        print '\n    notice:pressed \'q\' for quit,goodbye!'
+        exit()
+    recordlookup(inputstr)
+
+#日志装饰器
+'''
+def log(f):
+    def new_fn(x):
+        timenow = datetime.datetime.now()
+        print 'auto log: '+ str(timenow) + ' search for '+ '('+ x +')'
+        return f(x)
+    return new_fn
+'''
+def log(level):
+    def log_decorator(fx):
+        def wrapper(x, *args, **kw):
+            timenow = str(datetime.datetime.now())
+            print '[%s]: %s %s for ( %s ) .' % (level, timenow, fx.__name__, x)
+            return fx(x,*args, **kw)
+        return wrapper
+    return log_decorator
+
+#判断是否IP地址
 def isValidIP(str):
     if re.match(r"\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b", str):
         return True
     else:
         return False
 
+#MAC地址格式化成‘AA:BB:CC:DD:EE:FF’格式
+def macfmt(macadd):
+    i=''
+    for a in macadd:
+        if a.isdigit():
+            i=i+a
+        elif a.isalpha():
+            i=i+a.upper()
+    return i[0:2] + ':' + i[2:4] + ':' + i[4:6]+ ':' + i[6:8]+ ':' + i[8:10]+ ':' + i[10:]
+
+#判断是否是MAC地址
 def isValidMAC(str):
+    str=macfmt(str)
+    if len(str)==17:
+        return True
+    else:
+        return False
+'''
     if re.match(r"^\s*([0-9a-fA-F]{2,2}:){5,5}[0-9a-fA-F]{2,2}\s*$",str):
         return True
     else:
         return False
+'''
 
+#判断输入是否OK
 def isValidIPorMAC(str):
     if isValidIP(str):
         return True
@@ -37,68 +101,100 @@ def isValidIPorMAC(str):
         else:
             return False
 
-if isValidIPorMAC(inputstr):
-    if isValidIP(inputstr):
-        find_api=http_url+imc_url+api_url_ip+inputstr
-    else:
-        find_api=http_url+imc_url+api_url_mac+inputstr
-        api_url_history='/imcrs/uam/acmUser/acmDetailList?size=5&macAddress'+inputstr+'&desc=true'
-    try:
-        authhandler = urllib2.HTTPDigestAuthHandler()
-        authhandler.add_password("iMC RESTful Web Services", imc_url, usernames, passwords)
-        opener = urllib2.build_opener(authhandler)
-        urllib2.install_opener(opener)
-        pagehandle=urllib2.Request(find_api)
-        pagehandle.add_header('Accept', 'application/json')
+@log('INFO')
+def recordlookup(inputstr):
 
-        result = urllib2.urlopen(pagehandle)
-        findout=json.loads(result.read()).values()
+    usernames='aaa'
+    passwords='111'
 
-    except ValueError:
-        print '  Notice:the input address is NOT online now !'
+    imc_url='x.x.x.x'
+    http_url='https://'
+    api_url_ip='/imcrs/uam/online/onlineNotice?framedIp='
+    api_url_mac='/imcrs/uam/online/onlineNotice?macAddress='
+#    inputstr=raw_input('\ninput ip or mac address:')
+    api_url_history='/imcrs/uam/acmUser/acmDetailList?size=20&framedIpAddressFrom='+inputstr+'&framedIpAddressTo='+inputstr+'&desc=true'
 
-    else:
-        userip=findout[0]['framedIp']
-        starttime=findout[0]['beginTime']
-        frontstr=findout[0]['userName']
-        usermac=findout[0]['macAddress']
-        userfullname=findout[0]['fullName']
+    print '\n  Your Input is  :'+inputstr+'\n'
 
-        print '  Find 1 Online Record:'+'\n'
-
-        print '    UserIP/MAC:'+userip+' / '+usermac
-        print '    UserName  :'+frontstr+' / '+userfullname
-        print '    StartTime :'+starttime
-
-    try:
-        find_api=http_url+imc_url+api_url_history
-        pagehandle=urllib2.Request(find_api)
-        pagehandle.add_header('Accept', 'application/json')
-
-        result = urllib2.urlopen(pagehandle)
-        findout=json.loads(result.read())
-    except ValueError:
-        print '  Notice:the input address has NO online record !'
-    else:
-        try:
-            number=len(findout['acmDetail'])
-            number_list=min(len(findout['acmDetail']),5)
-        except KeyError:
-        	print '\n  Notice:the input address has NO online record !'
+    if isValidIPorMAC(inputstr):
+        if isValidIP(inputstr):
+            find_api=http_url+imc_url+api_url_ip+inputstr
         else:
-            print '\n  Find latest '+str(number)+' Result(s),'+ str(number_list) +' Record(s) listed below:\n'
+            inputstr=macfmt(inputstr)
+            find_api=http_url+imc_url+api_url_mac+inputstr
+            api_url_history='/imcrs/uam/acmUser/acmDetailList?size=20&macAddress='+inputstr+'&desc=true'
+        try:
+            authhandler = urllib2.HTTPDigestAuthHandler()
+            authhandler.add_password("iMC RESTful Web Services", imc_url, usernames, passwords)
+            opener = urllib2.build_opener(authhandler)
+            urllib2.install_opener(opener)
+            pagehandle=urllib2.Request(find_api)
+            pagehandle.add_header('Accept', 'application/json')
 
-            for seq in range(0,number_list):
-                findout_history=findout['acmDetail'][seq]
-                userip=findout_history['framedIpAddress']
-                starttime=findout_history['accessStartTime']
-                endtime=findout_history['accessEndTime']
-                frontstr=findout_history['userName']
-                usermac=findout_history['macAddress']
-                userfullname=findout_history['fullName']
-                print '    OnlineTime:'+starttime+' - '+endtime
-                print '    UserIP/MAC:'+userip+' / '+usermac
-                print '    UserName  :'+frontstr+' / '+userfullname+'\n'
+            result = urllib2.urlopen(pagehandle)
+            findout=json.loads(result.read()).values()
 
-else:
-    print '  Notice:input string is NOT a valid ip or MAC address !'
+        except ValueError:
+            print '  Notice:the input address is NOT online now !'
+
+        else:
+            userip=findout[0]['framedIp']
+            starttime=findout[0]['beginTime']
+            frontstr=findout[0]['userName']
+            usermac=findout[0]['macAddress']
+            userfullname=findout[0]['fullName']
+
+            print '  Find 1 Online Record:'+'\n'
+
+            print '    UserIP/MAC:'+userip+' / '+usermac
+            print '    UserName  :'+frontstr+' / '+userfullname
+            print '    StartTime :'+starttime
+
+        try:
+            find_api=http_url+imc_url+api_url_history
+            #print find_api
+
+            pagehandle=urllib2.Request(find_api)
+            pagehandle.add_header('Accept', 'application/json')
+
+            result = urllib2.urlopen(pagehandle)
+            findout=json.loads(result.read())
+        except ValueError:
+            print '  Notice:the input address has NO online record !'
+        else:
+            try:
+                number=len(findout['acmDetail'])
+                number_list=min(len(findout['acmDetail']),5)
+            except KeyError:
+                print '\n  Notice:the input address has NO online record !'
+            else:
+                print '\n  Find latest '+str(number)+' Result(s),'+ str(number_list) +' Record(s) listed below:\n'
+
+                for seq in range(0,number_list):
+                    findout_history=findout['acmDetail'][seq]
+                    userip=findout_history['framedIpAddress']
+                    starttime=findout_history['accessStartTime']
+                    endtime=findout_history['accessEndTime']
+                    frontstr=findout_history['userName']
+                    usermac=findout_history['macAddress']
+                    userfullname=findout_history['fullName']
+                    print '    OnlineTime:'+starttime+' - '+endtime
+                    print '    UserIP/MAC:'+userip+' / '+usermac
+                    print '    UserName  :'+frontstr+' / '+userfullname+'\n'
+
+    else:
+        print macfmt(inputstr)
+        print '  Notice:input string is NOT a valid IP or MAC address !'
+
+    #最后返回输入界面
+    print '\n'
+    forinput()
+
+#登陆banner
+sayhello()
+
+#登陆验证
+login_auth()
+
+#输入程序
+forinput()
