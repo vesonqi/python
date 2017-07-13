@@ -1,0 +1,37 @@
+0/  install homebrew
+
+    or homepage : http://brew.sh/index_zh-cn.html
+    or /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+    brew -v
+    brew update
+
+1/  install pyenv
+
+    brew install pyenv
+    
+    pyenv -v
+    
+2/  install python multiple versions
+
+    pyenv install -l
+    pyenv install 3.x.x
+    
+    pyenv rehash
+    pyenv versions
+    
+3/  edit bash_profile
+
+    vi .bash_profile
+    add:
+        export PYENV_ROOT="$HOME/.pyenv"
+        export PATH="$PYENV_ROOT/bin:$PATH"
+        eval "$(pyenv init -)"
+
+    source .bash_profile
+
+4/  switch python version
+
+    pyenv global 3.5.2
+    pyenv versions
+    python
