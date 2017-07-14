@@ -35,3 +35,12 @@
     pyenv global 3.5.2
     pyenv versions
     python
+
+5/  virtualenv
+
+    pip install virtualenv
+    
+    cd $/dictname
+        source ./bin/activate
+    
+    deactive
