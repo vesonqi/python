@@ -1,0 +1,27 @@
+import random
+import string
+import re
+
+
+def isValidIP(str):
+    if re.match(r"\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b", str):
+        return True
+    else:
+        return False
+
+def generate_random():
+
+    pool=('abcdefghijkmnpqrstuvwxyz123456789ABCDEFGHJKLMNPQRSTUVWXYZ')
+
+    str_ip=str(input('input IP address:'))
+    str_len=int(input('input key length:'))
+
+    generate_key=''.join(random.sample(pool,str_len))
+
+    str_add=''' - {ip: "''' + str_ip + '''" , key: "''' + generate_key + '''" }'''
+    #sample:' - {ip: "10.10.10.10" , key: "nGP5qjXbxk" }'
+
+    print('\n  the result is :')
+    print(str_add)
+
+generate_random()
